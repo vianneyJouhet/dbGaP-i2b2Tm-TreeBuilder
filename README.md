@@ -17,7 +17,7 @@ git clone https://github.com/vianneyJouhet/dbGaP-i2b2Tm-TreeBuilder.git
 ```
 ### Copy and adapt the properties.json file
 Copy ```properties.json``` from template to the root of the project
-```json
+```
 {
   "study_id" : "phs000286.v6.p2", ==> dgGap study id (phs that includes version and p)
   "current_object_id" : "286", ==> dbGap object id (number within the phs)
