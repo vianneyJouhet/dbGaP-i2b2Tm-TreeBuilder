@@ -1,0 +1,9 @@
+{
+  "study_id" : "phs000286.v6.p2",
+  "current_object_id" : "286",
+  "retrievePaths": "Y",
+  "buildMappingFile" : "Y",
+  "leafFilePath" : "<path>/leafDef.json",
+  "sourceMappingFile" : "<path>/mapping.csv",
+  "targetMappingFile" : "<path>/mapping.def.csv"
+}
