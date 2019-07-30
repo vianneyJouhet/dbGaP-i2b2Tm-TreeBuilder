@@ -22,9 +22,9 @@ Copy ```properties.json``` from template to the root of the project
  *  "current_object_id" : "286", ==> dbGap object id (number within the phs)
  *  "retrievePaths": "Y", ==> do you want yo retrieve path from dbGap (can be set to "N" in order to skip this part)
  *  "buildMappingFile" : "Y", ==> do you want to build a mapping file (needs sourceMappingFile and targetMappingFile to be set)
- *  "leafFilePath" : "/home/vianney/mobilite/Boston/dev/data/JHSDict/leafDef.json", ==> Target file for tree building (will replace file if exists)
- *  "sourceMappingFile" : "/home/vianney/mobilite/Boston/dev/data/JHSDict/mapping.csv", ==> Pre-existing Mapping file as defiend in i2b2 TranSMART ETL)
- *  "targetMappingFile" : "/home/vianney/mobilite/Boston/dev/data/JHSDict/mapping.def.csv" ==> Mapping File that will be created
+ *  "leafFilePath" : "<path>/leafDef.json", ==> Target file for tree building (will replace file if exists)
+ *  "sourceMappingFile" : "<path>/mapping.csv", ==> Pre-existing Mapping file as defiend in i2b2 TranSMART ETL)
+ *  "targetMappingFile" : "<path>/mapping.def.csv" ==> Mapping File that will be created
 
 
 
