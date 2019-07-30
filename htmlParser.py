@@ -1,4 +1,4 @@
-from html.parser import HTMLParser
+from HTMLParser import HTMLParser
 import re
 
 
