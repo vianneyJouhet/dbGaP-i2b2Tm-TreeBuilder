@@ -18,13 +18,13 @@ git clone https://github.com/vianneyJouhet/dbGaP-i2b2Tm-TreeBuilder.git
 ### Copy and adapt the properties.json file
 Copy ```properties.json``` from template to the root of the project
 
- *  "study_id" : "phs000286.v6.p2", * ==> dgGap study id (phs that includes version and p) 
- *  "current_object_id" : "286", ==> dbGap object id (number within the phs)
- *  "retrievePaths": "Y", ==> do you want yo retrieve path from dbGap (can be set to "N" in order to skip this part)
- *  "buildMappingFile" : "Y", ==> do you want to build a mapping file (needs sourceMappingFile and targetMappingFile to be set)
- *  "leafFilePath" : "<path>/leafDef.json", ==> Target file for tree building (will replace file if exists)
- *  "sourceMappingFile" : "<path>/mapping.csv", ==> Pre-existing Mapping file as defiend in i2b2 TranSMART ETL)
- *  "targetMappingFile" : "<path>/mapping.def.csv" ==> Mapping File that will be created
+ *  **study_id** ==> dgGap study id (phs that includes version and p) 
+ *  **current_object_id** ==> dbGap object id (number within the phs)
+ *  **retrievePaths** ==> do you want yo retrieve path from dbGap (can be set to "N" in order to skip this part)
+ *  **buildMappingFile** ==> do you want to build a mapping file (needs sourceMappingFile and targetMappingFile to be set)
+ *  **leafFilePath**  ==> Target file for tree building (will replace file if exists)
+ *  **sourceMappingFile** ==> Pre-existing Mapping file as defiend in i2b2 TranSMART ETL)
+ *  **targetMappingFile** ==> Mapping File that will be created
 
 
 
