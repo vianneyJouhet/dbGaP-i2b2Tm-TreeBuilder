@@ -1,0 +1,121 @@
+
+from htmlParser import MyHTMLParser
+import pprint
+import requests
+import re
+import json
+
+def getDbGapVarId(study_id,variable_id):
+    response = requests.get("https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/variable.cgi?study_id="+study_id+"&phv="+variable_id)
+    # print(response.text)
+    matchVariable = re.search("(phv[0-9]+\\.v[0-9]+\\.p[0-9]+)", response.text)
+    matchDataSet = re.search("(pht[0-9]+\\.v[0-9]+\\.p[0-9]+)", response.text)
+    # print(match)
+    dataSet = matchDataSet.group(1)
+    variable = matchVariable.group(1)
+    print('dataset', matchDataSet.group(1))
+    print('variable', matchVariable.group(1))
+    return dataSet, variable
+
+def parse(init_study_id, init_current_type, init_current_object_id, init_current_folder_type,leafs):
+
+    url = \
+        'https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/' + \
+        'GetFolderView.cgi?current_study_id=' + init_study_id + \
+        '&current_type=' + str(init_current_type) + \
+        '&current_object_id=' + str(init_current_object_id) + \
+        '&current_folder_type=' + str(init_current_folder_type)
+    print(url)
+    response = requests.get(url)
+    parser = MyHTMLParser()
+    parser.groupNodes = []
+    parser.leafs = []
+    parser.feed(response.text)
+    # pprint.pprint(response.text)
+    # pprint.pprint(parser.groupNodes)
+    pprint.pprint(parser.leafs)
+    groupNodes = parser.groupNodes
+    leafs.extend(parser.leafs)
+    # pprint.pprint(leafs)
+    print(groupNodes)
+    for groupNode in groupNodes:
+        print(url , groupNode)
+        study_id = groupNode.split(', ')[0].replace("'","").strip()
+        # print('current_object_upNode.split(', ')[0].replace("'","").strip()
+        current_type = groupNode.split(', ')[1].strip()
+        current_object_id = groupNode.split(', ')[2].strip()
+        current_folder_type = groupNode.split(', ')[3].strip()
+        print('current_object_id ', current_object_id)
+        parse(study_id, current_type, current_object_id, current_folder_type,leafs)
+        # print('leafs ' , leafs)
+
+
+with open('./properties.json') as json_data:
+    #  Read property file
+    data = json.load(json_data)
+    study_id = data.get('study_id')
+    current_object_id = data.get('current_object_id')
+    retrievePaths = data.get("retrievePaths")
+    buildMappingFile = data.get("buildMappingFile")
+    leafFilePath = data.get("leafFilePath")
+    sourceMappingFile = data.get("sourceMappingFile")
+    targetMappingFile = data.get("targetMappingFile")
+
+    # set default param for intitialization
+    current_type = 0
+    current_folder_type = 102
+    leafs = []
+    leafsDef = {}
+
+    if(retrievePaths == "Y"):
+        parse(study_id, current_type, current_object_id, current_folder_type, leafs)
+
+        for leaf in leafs:
+            print(leaf)
+            dataSet, variable = getDbGapVarId(study_id, leaf.get('phv'))
+            varIdentifier = study_id.split(".")[0]+"."+study_id.split(".")[1]+"."+dataSet+"."+variable.split(".")[0]+"."+variable.split(".")[1]
+            leafDef = {
+                "var": leaf.get('var'),
+                "path":  leaf.get('path'),
+                "phv":  leaf.get('phv'),
+                "varIdentifier": varIdentifier
+            }
+            leafsDef[varIdentifier] = leafDef
+
+        with open(leafFilePath, 'w') as outfile:
+            json.dump(leafsDef, outfile)
+            outfile.close()
+
+    if(buildMappingFile == "Y"):
+        with open(targetMappingFile, 'w') as targetMapping:
+            with open(leafFilePath) as leafsFile:
+                leafs = json.load(leafsFile)
+            with open(sourceMappingFile, 'r') as mappingSource:
+                lines = mappingSource.readlines()
+                mappingSource.close()
+            n = 0
+            for line in lines:
+                data = line.split(",")
+                if n == 0:
+                    h = 0
+                    for head in data:
+                        print(head)
+                        if head.strip() == "varIdentifier":
+                            keyIndex = h
+                            break
+                        h += 1
+                else:
+                    varIdentifier = data[keyIndex].replace('"', '').strip()
+                    oldPath = data[1]
+                    labelVar = data[1].split("\\")[-2]
+                    # print('oldPath', oldPath)
+                    # print('labelVar', labelVar)
+                    # print(varIdentifier)
+                    if varIdentifier in leafs:
+                        # pprint.pprint(leafs[varIdentifier])
+                        newPath = leafs[varIdentifier].get("path")+"\\"+labelVar
+                        # print('newPath', newPath)
+                        line = line.replace(oldPath, newPath)
+                        # print(line)
+                targetMapping.write(line)
+                n += 1
