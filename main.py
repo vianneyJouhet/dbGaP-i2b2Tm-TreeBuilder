@@ -113,7 +113,7 @@ with open('./properties.json') as json_data:
                     # print(varIdentifier)
                     if varIdentifier in leafs:
                         # pprint.pprint(leafs[varIdentifier])
-                        newPath = leafs[varIdentifier].get("path")+"\\"+labelVar
+                        newPath = leafs[varIdentifier].get("path")+"\\"+labelVar+"\\"
                         # print('newPath', newPath)
                         line = line.replace(oldPath, newPath)
                         # print(line)
