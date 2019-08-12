@@ -26,29 +26,31 @@ def parse(init_study_id, init_current_type, init_current_object_id, init_current
         '&current_object_id=' + str(init_current_object_id) + \
         '&current_folder_type=' + str(init_current_folder_type)
     print(url)
-    response = requests.get(url)
-    parser = MyHTMLParser()
-    parser.groupNodes = []
-    parser.leafs = []
-    parser.feed(response.text)
-    # pprint.pprint(response.text)
-    # pprint.pprint(parser.groupNodes)
-    pprint.pprint(parser.leafs)
-    groupNodes = parser.groupNodes
-    leafs.extend(parser.leafs)
-    # pprint.pprint(leafs)
-    print(groupNodes)
-    for groupNode in groupNodes:
-        print(url , groupNode)
-        study_id = groupNode.split(', ')[0].replace("'","").strip()
-        # print('current_object_upNode.split(', ')[0].replace("'","").strip()
-        current_type = groupNode.split(', ')[1].strip()
-        current_object_id = groupNode.split(', ')[2].strip()
-        current_folder_type = groupNode.split(', ')[3].strip()
-        print('current_object_id ', current_object_id)
-        parse(study_id, current_type, current_object_id, current_folder_type,leafs)
-        # print('leafs ' , leafs)
-
+    try:
+        response = requests.get(url)
+        parser = MyHTMLParser()
+        parser.groupNodes = []
+        parser.leafs = []
+        parser.feed(response.text)
+        # pprint.pprint(response.text)
+        # pprint.pprint(parser.groupNodes)
+        pprint.pprint(parser.leafs)
+        groupNodes = parser.groupNodes
+        leafs.extend(parser.leafs)
+        # pprint.pprint(leafs)
+        print(groupNodes)
+        for groupNode in groupNodes:
+            print(url , groupNode)
+            study_id = groupNode.split(', ')[0].replace("'","").strip()
+            # print('current_object_upNode.split(', ')[0].replace("'","").strip()
+            current_type = groupNode.split(', ')[1].strip()
+            current_object_id = groupNode.split(', ')[2].strip()
+            current_folder_type = groupNode.split(', ')[3].strip()
+            print('current_object_id ', current_object_id)
+            parse(study_id, current_type, current_object_id, current_folder_type,leafs)
+            # print('leafs ' , leafs)
+    except:
+        print("ERROR", "URL NOT RESPONDING ==>",url )
 
 with open('./properties.json') as json_data:
     #  Read property file
@@ -68,23 +70,23 @@ with open('./properties.json') as json_data:
     leafsDef = {}
 
     if(retrievePaths == "Y"):
-        parse(study_id, current_type, current_object_id, current_folder_type, leafs)
+            parse(study_id, current_type, current_object_id, current_folder_type, leafs)
 
-        for leaf in leafs:
-            print(leaf)
-            dataSet, variable = getDbGapVarId(study_id, leaf.get('phv'))
-            varIdentifier = study_id.split(".")[0]+"."+study_id.split(".")[1]+"."+dataSet+"."+variable.split(".")[0]+"."+variable.split(".")[1]
-            leafDef = {
-                "var": leaf.get('var'),
-                "path":  leaf.get('path'),
-                "phv":  leaf.get('phv'),
-                "varIdentifier": varIdentifier
-            }
-            leafsDef[varIdentifier] = leafDef
+            for leaf in leafs:
+                print(leaf)
+                dataSet, variable = getDbGapVarId(study_id, leaf.get('phv'))
+                varIdentifier = study_id.split(".")[0]+"."+study_id.split(".")[1]+"."+dataSet+"."+variable.split(".")[0]+"."+variable.split(".")[1]
+                leafDef = {
+                    "var": leaf.get('var'),
+                    "path":  leaf.get('path'),
+                    "phv":  leaf.get('phv'),
+                    "varIdentifier": varIdentifier
+                }
+                leafsDef[varIdentifier] = leafDef
 
-        with open(leafFilePath, 'w') as outfile:
-            json.dump(leafsDef, outfile)
-            outfile.close()
+            with open(leafFilePath, 'w') as outfile:
+                json.dump(leafsDef, outfile)
+                outfile.close()
 
     if(buildMappingFile == "Y"):
         with open(targetMappingFile, 'w') as targetMapping:
