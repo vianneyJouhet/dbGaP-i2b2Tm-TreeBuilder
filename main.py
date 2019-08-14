@@ -11,6 +11,7 @@ def getDbGapVarId(study_id,variable_id):
     matchVariable = re.search("(phv[0-9]+\\.v[0-9]+\\.p[0-9]+)", response.text)
     matchDataSet = re.search("(pht[0-9]+\\.v[0-9]+\\.p[0-9]+)", response.text)
     # print(match)
+
     dataSet = matchDataSet.group(1)
     variable = matchVariable.group(1)
     print('dataset', matchDataSet.group(1))
@@ -74,15 +75,18 @@ with open('./properties.json') as json_data:
 
             for leaf in leafs:
                 print(leaf)
-                dataSet, variable = getDbGapVarId(study_id, leaf.get('phv'))
-                varIdentifier = study_id.split(".")[0]+"."+study_id.split(".")[1]+"."+dataSet+"."+variable.split(".")[0]+"."+variable.split(".")[1]
-                leafDef = {
-                    "var": leaf.get('var'),
-                    "path":  leaf.get('path'),
-                    "phv":  leaf.get('phv'),
-                    "varIdentifier": varIdentifier
-                }
-                leafsDef[varIdentifier] = leafDef
+                try:
+                    dataSet, variable = getDbGapVarId(study_id, leaf.get('phv'))
+                    varIdentifier = study_id.split(".")[0]+"."+study_id.split(".")[1]+"."+dataSet+"."+variable.split(".")[0]+"."+variable.split(".")[1]
+                    leafDef = {
+                        "var": leaf.get('var'),
+                        "path":  leaf.get('path'),
+                        "phv":  leaf.get('phv'),
+                        "varIdentifier": varIdentifier
+                    }
+                    leafsDef[varIdentifier] = leafDef
+                except:
+                    print("ERROR", "URL NOT RESPONDING ==>",study_id, leaf.get('phv'))
 
             with open(leafFilePath, 'w') as outfile:
                 json.dump(leafsDef, outfile)
