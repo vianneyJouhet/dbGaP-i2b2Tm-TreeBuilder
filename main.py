@@ -74,20 +74,21 @@ with open('./properties.json') as json_data:
     print("---------------------------")
     print("Checking directories")
 
-    print(" - " +  os.path.dirname(leafFilePath) + " - " + str(os.path.exists(os.path.dirname(leafFilePath))))
-    if not os.path.exists(os.path.dirname(leafFilePath)):
-        print(leafFilePath, "Does not exists - Stopping")
-        sys.exit("[ERROR] "+ leafFilePath + " Does not exists - Stopped")
+    if(retrievePaths == "Y"):
+        print(" - " +  os.path.dirname(leafFilePath) + " - " + str(os.path.exists(os.path.dirname(leafFilePath))))
+        if not os.path.exists(os.path.dirname(leafFilePath)):
+            print(leafFilePath, "Does not exists - Stopping")
+            sys.exit("[ERROR] "+ leafFilePath + " Does not exists - Stopped")
+    if(buildMappingFile == "Y"):
+        print(" - " + sourceMappingFile  + " - " + str(os.path.exists(sourceMappingFile)))
+        if not os.path.exists(sourceMappingFile):
+            print(sourceMappingFile, "Does not exists - Stopping")
+            sys.exit("[ERROR] "+sourceMappingFile + " Does not exists - Stopped")
 
-    print(" - " + sourceMappingFile  + " - " + str(os.path.exists(sourceMappingFile)))
-    if not os.path.exists(sourceMappingFile):
-        print(sourceMappingFile, "Does not exists - Stopping")
-        sys.exit("[ERROR] "+sourceMappingFile + " Does not exists - Stopped")
-
-    print(" - " +  os.path.dirname(targetMappingFile) + " - " + str(os.path.exists(os.path.dirname(targetMappingFile))))
-    if not os.path.exists(os.path.dirname(targetMappingFile)):
-        print(targetMappingFile, "Does not exists - Stopping")
-        sys.exit("[ERROR] "+targetMappingFile + " Does not exists - Stopped")
+        print(" - " +  os.path.dirname(targetMappingFile) + " - " + str(os.path.exists(os.path.dirname(targetMappingFile))))
+        if not os.path.exists(os.path.dirname(targetMappingFile)):
+            print(targetMappingFile, "Does not exists - Stopping")
+            sys.exit("[ERROR] "+targetMappingFile + " Does not exists - Stopped")
 
     if(retrievePaths == "Y"):
             parse(study_id, current_type, current_object_id, current_folder_type, leafs)
