@@ -4,6 +4,7 @@ import pprint
 import requests
 import re
 import json
+import os, sys
 
 def getDbGapVarId(study_id,variable_id):
     response = requests.get("https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/variable.cgi?study_id="+study_id+"&phv="+variable_id)
@@ -11,6 +12,7 @@ def getDbGapVarId(study_id,variable_id):
     matchVariable = re.search("(phv[0-9]+\\.v[0-9]+\\.p[0-9]+)", response.text)
     matchDataSet = re.search("(pht[0-9]+\\.v[0-9]+\\.p[0-9]+)", response.text)
     # print(match)
+
     dataSet = matchDataSet.group(1)
     variable = matchVariable.group(1)
     print('dataset', matchDataSet.group(1))
@@ -69,20 +71,42 @@ with open('./properties.json') as json_data:
     leafs = []
     leafsDef = {}
 
+    print("---------------------------")
+    print("Checking directories")
+
+    if(retrievePaths == "Y"):
+        print(" - " +  os.path.dirname(leafFilePath) + " - " + str(os.path.exists(os.path.dirname(leafFilePath))))
+        if not os.path.exists(os.path.dirname(leafFilePath)):
+            print(leafFilePath, "Does not exists - Stopping")
+            sys.exit("[ERROR] "+ leafFilePath + " Does not exists - Stopped")
+    if(buildMappingFile == "Y"):
+        print(" - " + sourceMappingFile  + " - " + str(os.path.exists(sourceMappingFile)))
+        if not os.path.exists(sourceMappingFile):
+            print(sourceMappingFile, "Does not exists - Stopping")
+            sys.exit("[ERROR] "+sourceMappingFile + " Does not exists - Stopped")
+
+        print(" - " +  os.path.dirname(targetMappingFile) + " - " + str(os.path.exists(os.path.dirname(targetMappingFile))))
+        if not os.path.exists(os.path.dirname(targetMappingFile)):
+            print(targetMappingFile, "Does not exists - Stopping")
+            sys.exit("[ERROR] "+targetMappingFile + " Does not exists - Stopped")
+
     if(retrievePaths == "Y"):
             parse(study_id, current_type, current_object_id, current_folder_type, leafs)
 
             for leaf in leafs:
                 print(leaf)
-                dataSet, variable = getDbGapVarId(study_id, leaf.get('phv'))
-                varIdentifier = study_id.split(".")[0]+"."+study_id.split(".")[1]+"."+dataSet+"."+variable.split(".")[0]+"."+variable.split(".")[1]
-                leafDef = {
-                    "var": leaf.get('var'),
-                    "path":  leaf.get('path'),
-                    "phv":  leaf.get('phv'),
-                    "varIdentifier": varIdentifier
-                }
-                leafsDef[varIdentifier] = leafDef
+                try:
+                    dataSet, variable = getDbGapVarId(study_id, leaf.get('phv'))
+                    varIdentifier = study_id.split(".")[0]+"."+study_id.split(".")[1]+"."+dataSet+"."+variable.split(".")[0]+"."+variable.split(".")[1]
+                    leafDef = {
+                        "var": leaf.get('var'),
+                        "path":  leaf.get('path'),
+                        "phv":  leaf.get('phv'),
+                        "varIdentifier": varIdentifier
+                    }
+                    leafsDef[varIdentifier] = leafDef
+                except:
+                    print("ERROR", "URL NOT RESPONDING ==>",study_id, leaf.get('phv'))
 
             with open(leafFilePath, 'w') as outfile:
                 json.dump(leafsDef, outfile)
