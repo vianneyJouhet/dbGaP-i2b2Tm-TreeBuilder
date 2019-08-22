@@ -13,10 +13,12 @@ def getDbGapVarId(study_id,variable_id):
     matchDataSet = re.search("(pht[0-9]+\\.v[0-9]+\\.p[0-9]+)", response.text)
     # print(match)
 
-    dataSet = matchDataSet.group(1)
+    if matchVariable:
+        dataSet = matchDataSet.group(1)
     variable = matchVariable.group(1)
-    print('dataset', matchDataSet.group(1))
-    print('variable', matchVariable.group(1))
+    if matchDataSet:
+        print('dataset', matchDataSet.group(1))
+        print('variable', matchVariable.group(1))
     return dataSet, variable
 
 def parse(init_study_id, init_current_type, init_current_object_id, init_current_folder_type,leafs):
