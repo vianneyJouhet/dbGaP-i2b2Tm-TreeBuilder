@@ -21,8 +21,8 @@ def getDbGapVarId(study_id,variable_id):
         print('variable', matchVariable.group(1))
     return dataSet, variable
 
-def parse(init_study_id, init_current_type, init_current_object_id, init_current_folder_type,leafs):
-
+def parse(init_study_id, init_current_type, init_current_object_id, init_current_folder_type,leafs,fileNum,study_id):
+    fileNum += 1
     url = \
         'https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/' + \
         'GetFolderView.cgi?current_study_id=' + init_study_id + \
@@ -41,7 +41,30 @@ def parse(init_study_id, init_current_type, init_current_object_id, init_current
         pprint.pprint(parser.leafs)
         groupNodes = parser.groupNodes
         leafs.extend(parser.leafs)
-        # pprint.pprint(leafs)
+        leafsDef = {}
+        print("exists" + leafFilePath + "-"+str(init_current_object_id), os.path.exists(leafFilePath + "-"+str(init_current_object_id)))
+        if not os.path.exists(leafFilePath + "-"+str(init_current_object_id)):
+            for leaf in leafs:
+                print(leaf)
+                try:
+                    dataSet, variable = getDbGapVarId(study_id, leaf.get('phv'))
+                    varIdentifier = study_id.split(".")[0]+"."+study_id.split(".")[1]+"."+dataSet+"."+variable.split(".")[0]+"."+variable.split(".")[1]
+                    leafDef = {
+                        "var": leaf.get('var'),
+                        "path":  leaf.get('path'),
+                        "phv":  leaf.get('phv'),
+                        "varIdentifier": varIdentifier
+                    }
+                    leafsDef[varIdentifier] = leafDef
+                except:
+                    print("ERROR", "URL NOT RESPONDING ==>",study_id, leaf.get('phv'))
+            print("leafsDef", bool(leafsDef),init_current_object_id)
+            if bool(leafsDef):
+                with open(leafFilePath + "-"+str(init_current_object_id), 'w') as outfile:
+                    json.dump(leafsDef, outfile)
+                    outfile.close()
+            # pprint.pprint(leafs)
+        leafs = []
         print(groupNodes)
         for groupNode in groupNodes:
             print(url , groupNode)
@@ -51,7 +74,7 @@ def parse(init_study_id, init_current_type, init_current_object_id, init_current
             current_object_id = groupNode.split(', ')[2].strip()
             current_folder_type = groupNode.split(', ')[3].strip()
             print('current_object_id ', current_object_id)
-            parse(study_id, current_type, current_object_id, current_folder_type,leafs)
+            parse(study_id, current_type, current_object_id, current_folder_type,leafs,fileNum,study_id)
             # print('leafs ' , leafs)
     except:
         print("ERROR", "URL NOT RESPONDING ==>",url )
@@ -71,8 +94,8 @@ with open('./properties.json') as json_data:
     current_type = 0
     current_folder_type = 102
     leafs = []
-    leafsDef = {}
 
+    fileNum = 0
     print("---------------------------")
     print("Checking directories")
 
@@ -93,7 +116,7 @@ with open('./properties.json') as json_data:
             sys.exit("[ERROR] "+targetMappingFile + " Does not exists - Stopped")
 
     if(retrievePaths == "Y"):
-            parse(study_id, current_type, current_object_id, current_folder_type, leafs)
+            parse(study_id, current_type, current_object_id, current_folder_type, leafs,fileNum,leafFilePath)
 
             for leaf in leafs:
                 print(leaf)
