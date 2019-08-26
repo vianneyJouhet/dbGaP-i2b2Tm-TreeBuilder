@@ -104,6 +104,7 @@ with open('./properties.json') as json_data:
         if not os.path.exists(os.path.dirname(leafFilePath)):
             print(leafFilePath, "Does not exists - Stopping")
             sys.exit("[ERROR] "+ leafFilePath + " Does not exists - Stopped")
+
     if(buildMappingFile == "Y"):
         print(" - " + sourceMappingFile  + " - " + str(os.path.exists(sourceMappingFile)))
         if not os.path.exists(sourceMappingFile):
@@ -116,26 +117,33 @@ with open('./properties.json') as json_data:
             sys.exit("[ERROR] "+targetMappingFile + " Does not exists - Stopped")
 
     if(retrievePaths == "Y"):
-            parse(study_id, current_type, current_object_id, current_folder_type, leafs,fileNum,leafFilePath)
-
-            for leaf in leafs:
-                print(leaf)
-                try:
-                    dataSet, variable = getDbGapVarId(study_id, leaf.get('phv'))
-                    varIdentifier = study_id.split(".")[0]+"."+study_id.split(".")[1]+"."+dataSet+"."+variable.split(".")[0]+"."+variable.split(".")[1]
-                    leafDef = {
-                        "var": leaf.get('var'),
-                        "path":  leaf.get('path'),
-                        "phv":  leaf.get('phv'),
-                        "varIdentifier": varIdentifier
-                    }
-                    leafsDef[varIdentifier] = leafDef
-                except:
-                    print("ERROR", "URL NOT RESPONDING ==>",study_id, leaf.get('phv'))
-
+            # parse(study_id, current_type, current_object_id, current_folder_type, leafs,fileNum,leafFilePath)
+            leafsDef = {}
+            for file in os.listdir(os.path.dirname(leafFilePath)):
+                if re.match(os.path.basename(leafFilePath) + "-[0-9]+",file):
+                    print(file)
+                    with open(os.path.dirname(leafFilePath)+"/"+file) as json_data:
+                        data = json.load(json_data)
+                        leafsDef.update(data)
             with open(leafFilePath, 'w') as outfile:
                 json.dump(leafsDef, outfile)
                 outfile.close()
+            # for leaf in leafs
+            #     print(leaf)
+            #     try:
+            #         dataSet, variable = getDbGapVarId(study_id, leaf.get('phv'))
+            #         varIdentifier = study_id.split(".")[0]+"."+study_id.split(".")[1]+"."+dataSet+"."+variable.split(".")[0]+"."+variable.split(".")[1]
+            #         leafDef = {
+            #             "var": leaf.get('var'),
+            #             "path":  leaf.get('path'),
+            #             "phv":  leaf.get('phv'),
+            #             "varIdentifier": varIdentifier
+            #         }
+            #         leafsDef[varIdentifier] = leafDef
+            #     except:
+            #         print("ERROR", "URL NOT RESPONDING ==>",study_id, leaf.get('phv'))
+
+
 
     if(buildMappingFile == "Y"):
         with open(targetMappingFile, 'w') as targetMapping:
