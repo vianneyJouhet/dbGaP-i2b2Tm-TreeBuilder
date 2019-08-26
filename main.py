@@ -64,7 +64,6 @@ def parse(init_study_id, init_current_type, init_current_object_id, init_current
                     json.dump(leafsDef, outfile)
                     outfile.close()
             # pprint.pprint(leafs)
-        leafs = []
         print(groupNodes)
         for groupNode in groupNodes:
             print(url , groupNode)
@@ -74,6 +73,7 @@ def parse(init_study_id, init_current_type, init_current_object_id, init_current
             current_object_id = groupNode.split(', ')[2].strip()
             current_folder_type = groupNode.split(', ')[3].strip()
             print('current_object_id ', current_object_id)
+            leafs = []
             parse(study_id, current_type, current_object_id, current_folder_type,leafs,fileNum,study_id)
             # print('leafs ' , leafs)
     except:
