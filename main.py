@@ -117,7 +117,7 @@ with open('./properties.json') as json_data:
             sys.exit("[ERROR] "+targetMappingFile + " Does not exists - Stopped")
 
     if(retrievePaths == "Y"):
-            # parse(study_id, current_type, current_object_id, current_folder_type, leafs,fileNum,leafFilePath)
+            parse(study_id, current_type, current_object_id, current_folder_type, leafs,fileNum,leafFilePath)
             leafsDef = {}
             for file in os.listdir(os.path.dirname(leafFilePath)):
                 if re.match(os.path.basename(leafFilePath) + "-[0-9]+",file):
