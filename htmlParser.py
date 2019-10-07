@@ -57,5 +57,5 @@ class MyHTMLParser(HTMLParser):
             print(newPath)
         if self.addToPath:
             self.addToPath = False
-            self.path += "\\" + data.replace(";", ".").replace(",", " ").replace("\"", "").replace("\n", " ")
+            self.path += "\\" + data.replace(";", ".").replace(",", " ").replace("\"", "").replace("\n", " ").replace("\\","/")
             print(data)
